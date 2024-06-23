@@ -5,47 +5,69 @@
   },
   "ignorePatterns": ["node_modules", "dist", "build"],
   "extends": [
+    "airbnb",
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:prettier/recommended",
     "plugin:import/errors",
-    "plugin:import/warnings"
+    "plugin:import/warnings",
+    "plugin:react-hooks/recommended"
   ],
   "parserOptions": {
     "ecmaFeatures": {
-      "jsx": true
+      "jsx": true,
+      "useJSXTextNode": true
     },
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
-  "plugins": ["react", "prettier", "import"],
+  "plugins": ["react", "jsx-a11y", "import", "react-hooks", "prettier"],
   "rules": {
     "indent": ["error", 2],
+    "no-trailing-spaces": ["error", { "skipBlankLines": false }],
     "prettier/prettier": [
       "error",
       {
         "endOfLine": "auto"
       }
     ],
-    "linebreak-style": [0, "unix"],
+    "react/static-property-placement": ["error", "static public field"],
+    "jsx-a11y/label-has-associated-control": 0,
+    "jsx-a11y/control-has-associated-label": 0,
+    "linebreak-style": [0, "windows"],
+    "react/self-closing-comp": "off",
     "quotes": ["error", "single"],
-    "semi": ["error", "never"],
     "react/react-in-jsx-scope": "off",
     "react/prop-types": 0,
     "import/no-unresolved": [2, { "caseSensitive": false }],
     "react/jsx-filename-extension": [1, { "extensions": [".js", ".jsx"] }],
+    "import/no-extraneous-dependencies": [
+      "error",
+      {
+        "devDependencies": false,
+        "optionalDependencies": false,
+        "peerDependencies": false
+      }
+    ],
     "import/order": [
       2,
       {
         "groups": ["builtin", "external", "internal", "parent", "sibling", "index"],
         "newlines-between": "always"
       }
+    ],
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "never",
+        "jsx": "never",
+        "ts": "never",
+        "tsx": "never"
+      }
     ]
   },
   "settings": {
-    "react": {
-      "version": "detect"
-    },
     "import/resolver": {
       "node": {
         "extensions": [".js", ".jsx", ".ts", ".tsx"],
