@@ -1,10 +1,11 @@
 import View from './View';
 import './Task.css';
 
-export default function Task() {
+export default function Task({ content }) {
   return (
-    <li>
-      <View />
-    </li>
+    <View
+      description={content}
+      createdDate={`created ${new Date().getHours()}:${new Date().getMinutes()}`}
+    />
   );
 }

@@ -1,15 +1,18 @@
 import TaskList from '../Tasks/TaskList';
-import Header from '../Header';
-import Main from '../Main';
+import NewTaskForm from '../NewTaskForm';
 import './TodoApp.css';
+
+const todoList = [
+  { id: 1, content: 'learn react' },
+  { id: 2, content: 'to stay of gigachad' },
+  { id: 3, content: 'get the car' },
+];
 
 export default function TodoApp() {
   return (
     <section className="todoapp">
-      <Header />
-      <Main>
-        <TaskList />
-      </Main>
+      <NewTaskForm />
+      <TaskList todoList={todoList} />
     </section>
   );
 }
