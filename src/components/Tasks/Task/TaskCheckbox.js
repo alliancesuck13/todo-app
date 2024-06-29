@@ -1,3 +1,3 @@
-export default function TaskCheckbox() {
-  return <input className="toggle" type="checkbox" />;
+export default function TaskCheckbox({ onClick = null }) {
+  return <input className="toggle" type="checkbox" onClick={onClick} />;
 }
