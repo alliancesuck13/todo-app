@@ -12,10 +12,16 @@ class NewTaskForm extends React.Component {
     return (
       <header className="header">
         <h1>Todo App</h1>
-        <input className="new-todo" placeholder={placeholder} />
-        <button type="button" onClick={() => onTaskAdded('Погулять')}>
-          Add Task
-        </button>
+        <input
+          className="new-todo"
+          placeholder={placeholder}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' && e.target.value) {
+              onTaskAdded(e.target.value);
+              e.target.value = '';
+            }
+          }}
+        />
       </header>
     );
   }

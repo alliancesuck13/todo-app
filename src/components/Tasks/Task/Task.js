@@ -2,8 +2,6 @@
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
 
-import TaskCheckbox from './TaskCheckbox';
-import TaskChange from './TaskChange';
 import './Task.css';
 
 class Task extends React.Component {
@@ -22,11 +20,6 @@ class Task extends React.Component {
     clearInterval(this.timerID);
   }
 
-  onTaskCheckboxClick = () => {
-    const { content } = this.props;
-    console.log(`Задача выполнена: "${content}"`, this);
-  };
-
   tick() {
     this.setState((prevState) => {
       return {
@@ -36,13 +29,13 @@ class Task extends React.Component {
   }
 
   render() {
-    const { content, onDelete } = this.props;
+    const { content, onDelete, onComplete } = this.props;
     const { date } = this.state;
 
     return (
-      <form>
+      <>
         <div className="view">
-          <TaskCheckbox onClick={this.onTaskCheckboxClick} />
+          <input className="toggle" type="checkbox" onClick={onComplete} />
           <label>
             <span className="description">{content}</span>
             <span className="created">{formatDistanceToNow(date)} ago</span>
@@ -50,8 +43,8 @@ class Task extends React.Component {
           <button className="icon icon-edit" type="button"></button>
           <button className="icon icon-destroy" type="button" onClick={onDelete}></button>
         </div>
-        <TaskChange />
-      </form>
+        <input type="text" className="edit" />;
+      </>
     );
   }
 }

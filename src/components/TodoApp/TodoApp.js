@@ -13,6 +13,7 @@ class TodoApp extends React.Component {
 
     this.state = {
       todoList: [],
+      todoListCount: 0,
     };
   }
 
@@ -22,6 +23,7 @@ class TodoApp extends React.Component {
 
       return {
         todoList: prevState.todoList.toSpliced(index, 1),
+        todoListCount: prevState.todoListCount - 1,
       };
     });
   };
@@ -30,30 +32,47 @@ class TodoApp extends React.Component {
     const newTask = {
       id: generateUniqueID(),
       content: text,
+      isActive: true,
     };
 
     this.setState((prevState) => {
       return {
-        todoList: prevState.todoList.toSpliced(newTask),
+        todoList: prevState.todoList.toSpliced(0, 0, newTask),
+        todoListCount: prevState.todoListCount + 1,
       };
     });
-
-    console.log(`added ${generateUniqueID()}`, text, this);
   };
 
-  // todo: сделать корректное добавление такски
+  // todo: active-completed task
+
+  completeTask = (id) => {
+    this.setState((prevState) => {
+      const { isActive } = prevState.TaskList;
+      const completedTask = {
+        isActive: !isActive,
+      };
+      const index = prevState.todoList.findIndex((task) => task.id === id);
+      return {
+        todoList: prevState.todoList.toSpliced(index, completedTask),
+        todoListCount: prevState.todoListCount - 1,
+      };
+    });
+  };
 
   render() {
-    const { todoList } = this.state;
+    const { todoList, todoListCount } = this.state;
     return (
       <section className="todoapp">
         <NewTaskForm onTaskAdded={this.addTask} />
-        <TaskList
-          todoList={todoList}
-          onTaskDeleted={this.deleteTask}
-          onTaskAdded={this.addTask}
-        />
-        <Footer />
+        <section className="main">
+          <TaskList
+            todoList={todoList}
+            onTaskDeleted={this.deleteTask}
+            onTaskAdded={this.addTask}
+            onTaskCompleted={this.completeTask}
+          />
+          <Footer todoListCount={todoListCount} />
+        </section>
       </section>
     );
   }
