@@ -23,8 +23,19 @@ class TodoApp extends React.Component {
 
       return {
         todoList: prevState.todoList.toSpliced(index, 1),
-        todoListCount: prevState.todoListCount - 1,
+        todoListCount: prevState.todoList[index].isActive
+          ? prevState.todoListCount - 1
+          : prevState.todoListCount,
       };
+    });
+  };
+
+  handleClearCompleted = () => {
+    const { todoList } = this.state;
+    const completedTasks = todoList.filter((task) => !task.isActive);
+
+    completedTasks.forEach((task) => {
+      this.deleteTask(task.id);
     });
   };
 
@@ -36,9 +47,12 @@ class TodoApp extends React.Component {
     };
 
     this.setState((prevState) => {
+      const updatedTodoList = prevState.todoList.toSpliced(0, 0, newTask);
+      const updatedCount = prevState.todoListCount + 1;
+
       return {
-        todoList: prevState.todoList.toSpliced(0, 0, newTask),
-        todoListCount: prevState.todoListCount + 1,
+        todoList: updatedTodoList,
+        todoListCount: updatedCount,
       };
     });
   };
@@ -74,10 +88,12 @@ class TodoApp extends React.Component {
           <TaskList
             todoList={todoList}
             onTaskDeleted={this.deleteTask}
-            onTaskAdded={this.addTask}
             onTaskCompleted={this.completeTask}
           />
-          <Footer todoListCount={todoListCount} />
+          <Footer
+            todoListCount={todoListCount}
+            handleClearCompleted={this.handleClearCompleted}
+          />
         </section>
       </section>
     );

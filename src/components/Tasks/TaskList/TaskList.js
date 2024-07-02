@@ -2,7 +2,6 @@
 import React from 'react';
 
 import Task from '../Task';
-
 import './TaskList.css';
 
 class TaskList extends React.Component {
@@ -15,6 +14,7 @@ class TaskList extends React.Component {
             content={item.content}
             onDelete={() => onTaskDeleted(item.id)}
             onComplete={() => onTaskCompleted(item.id)}
+            onDeleteCompletedTasks={() => onTaskCompleted(item.id)}
           />
         </li>
       );

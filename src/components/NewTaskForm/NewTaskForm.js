@@ -16,8 +16,9 @@ class NewTaskForm extends React.Component {
           className="new-todo"
           placeholder={placeholder}
           onKeyDown={(e) => {
+            if (e.target.value.match(/^[ ]+$/)) return;
             if (e.key === 'Enter' && e.target.value) {
-              onTaskAdded(e.target.value);
+              onTaskAdded(e.target.value.trim());
               e.target.value = '';
             }
           }}

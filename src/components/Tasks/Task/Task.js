@@ -43,7 +43,18 @@ class Task extends React.Component {
           <button className="icon icon-edit" type="button"></button>
           <button className="icon icon-destroy" type="button" onClick={onDelete}></button>
         </div>
-        <input type="text" className="edit" />
+        {/* todo: edit input */}
+        {/* <input
+          type="text"
+          className="edit"
+          onKeyDown={(e) => {
+            if (e.target.value.match(/^[ ]+$/)) return;
+            if (e.key === 'Enter' && e.target.value) {
+              onTaskAdded(e.target.value.trim());
+              e.target.value = '';
+            }
+          }}
+        /> */}
       </>
     );
   }
