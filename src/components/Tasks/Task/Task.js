@@ -43,7 +43,7 @@ class Task extends React.Component {
           <button className="icon icon-edit" type="button"></button>
           <button className="icon icon-destroy" type="button" onClick={onDelete}></button>
         </div>
-        <input type="text" className="edit" />;
+        <input type="text" className="edit" />
       </>
     );
   }

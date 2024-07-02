@@ -9,7 +9,7 @@ class Footer extends React.Component {
     const { todoListCount } = this.props;
     return (
       <footer className="footer">
-        <span className="todo-count">{todoListCount} items left</span>
+        <span className="todo-count">{todoListCount} tasks left</span>
         <TaskFilter />
         <button className="clear-completed" type="button">
           Clear completed

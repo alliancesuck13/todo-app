@@ -43,18 +43,24 @@ class TodoApp extends React.Component {
     });
   };
 
-  // todo: active-completed task
-
   completeTask = (id) => {
     this.setState((prevState) => {
-      const { isActive } = prevState.TaskList;
-      const completedTask = {
-        isActive: !isActive,
-      };
-      const index = prevState.todoList.findIndex((task) => task.id === id);
+      let updatedTodoListCount = prevState.todoListCount;
+      const updatedTodoList = prevState.todoList.map((task) => {
+        if (task.id === id) {
+          if (task.isActive) {
+            updatedTodoListCount -= 1;
+          } else {
+            updatedTodoListCount += 1;
+          }
+          return { ...task, isActive: !task.isActive };
+        }
+        return task;
+      });
+
       return {
-        todoList: prevState.todoList.toSpliced(index, completedTask),
-        todoListCount: prevState.todoListCount - 1,
+        todoList: updatedTodoList,
+        todoListCount: updatedTodoListCount,
       };
     });
   };
