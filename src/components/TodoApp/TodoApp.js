@@ -38,7 +38,7 @@ class TodoApp extends React.Component {
     });
   };
 
-  editTask = (id, ...text) => {
+  editTask = (id, text) => {
     this.setState((prevState) => {
       const updatedTodoList = prevState.todoList.map((task) => {
         if (task.id === id) {

@@ -1,10 +1,39 @@
 /* eslint-disable react/prefer-stateless-function */
 import React from 'react';
 import { formatDistanceToNow } from 'date-fns';
+import PropTypes from 'prop-types';
 
 import './Task.css';
 
 class Task extends React.Component {
+  static propTypes = {
+    content: PropTypes.string,
+    creationDate: PropTypes.instanceOf(Date),
+    isChecked: PropTypes.bool,
+    onDelete: PropTypes.func,
+    onComplete: PropTypes.func,
+    onEdit: PropTypes.func,
+    handleEditTask: PropTypes.func,
+  };
+
+  static defaultProps = {
+    content: 'Lorem',
+    creationDate: new Date(),
+    isChecked: false,
+    onDelete: () => {
+      throw new TypeError(`Отсутствует prop onDelete в ${this}`);
+    },
+    onComplete: () => {
+      throw new TypeError(`Отсутствует prop onComplete в ${this}`);
+    },
+    onEdit: () => {
+      throw new TypeError(`Отсутствует prop onEdit в ${this}`);
+    },
+    handleEditTask: () => {
+      throw new TypeError(`Отсутствует prop handleEditTask в ${this}`);
+    },
+  };
+
   componentDidMount() {
     this.timerID = setInterval(() => {
       this.forceUpdate();

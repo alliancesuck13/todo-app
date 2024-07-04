@@ -1,9 +1,20 @@
 /* eslint-disable react/prefer-stateless-function */
 import React from 'react';
+import PropTypes from 'prop-types';
 
 import './NewTaskForm.css';
 
 class NewTaskForm extends React.Component {
+  static propTypes = {
+    onTaskAdded: PropTypes.func,
+  };
+
+  static defaultProps = {
+    onTaskAdded: () => {
+      throw new TypeError(`Отсутствует prop добавления Task в ${this}`);
+    },
+  };
+
   // В данном проекте у меня нет сервера на который отправляются данные
   // поэтому я не вижу никакого смысла оборачивать инпут в <form></form> =)
   onEnter = (e) => {
