@@ -5,14 +5,9 @@ import { formatDistanceToNow } from 'date-fns';
 import './Task.css';
 
 class Task extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { date: new Date() };
-  }
-
   componentDidMount() {
     this.timerID = setInterval(() => {
-      this.tick();
+      this.forceUpdate();
     }, 1000);
   }
 
@@ -20,41 +15,50 @@ class Task extends React.Component {
     clearInterval(this.timerID);
   }
 
-  tick() {
-    this.setState((prevState) => {
-      return {
-        date: new Date(prevState.date.getTime() - 1000),
-      };
-    });
-  }
+  keyDown = (e) => {
+    const { onEdit, handleEditTask } = this.props;
+    if (e.key === 'Enter') {
+      if (e.target.value.length === 0) return;
+      if (e.target.value.match(/^[ ]+$/)) return;
+      onEdit(e.target.value);
+      handleEditTask();
+    }
+    if (e.key === 'Escape') handleEditTask();
+  };
 
   render() {
-    const { content, onDelete, onComplete } = this.props;
-    const { date } = this.state;
+    const { content, creationDate, isChecked, onDelete, onComplete, handleEditTask } =
+      this.props;
+
+    const createdAt = formatDistanceToNow(new Date(creationDate), { addSuffix: true });
+    const hide = {};
+
+    if (isChecked) hide.display = 'none';
+    else hide.display = '';
 
     return (
       <>
         <div className="view">
-          <input className="toggle" type="checkbox" onClick={onComplete} />
-          <label>
+          <input
+            className="toggle"
+            id="toggleID"
+            type="checkbox"
+            onClick={onComplete}
+            defaultChecked={isChecked}
+          />
+          <label htmlFor="toggleID">
             <span className="description">{content}</span>
-            <span className="created">{formatDistanceToNow(date)} ago</span>
+            <span className="created">{createdAt}</span>
           </label>
-          <button className="icon icon-edit" type="button"></button>
+          <button
+            className="icon icon-edit"
+            style={hide}
+            type="button"
+            onClick={handleEditTask}
+          ></button>
           <button className="icon icon-destroy" type="button" onClick={onDelete}></button>
         </div>
-        {/* todo: edit input */}
-        {/* <input
-          type="text"
-          className="edit"
-          onKeyDown={(e) => {
-            if (e.target.value.match(/^[ ]+$/)) return;
-            if (e.key === 'Enter' && e.target.value) {
-              onTaskAdded(e.target.value.trim());
-              e.target.value = '';
-            }
-          }}
-        /> */}
+        <input type="text" className="edit" onKeyDown={this.keyDown} />
       </>
     );
   }

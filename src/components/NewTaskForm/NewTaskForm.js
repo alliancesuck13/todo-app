@@ -4,25 +4,25 @@ import React from 'react';
 import './NewTaskForm.css';
 
 class NewTaskForm extends React.Component {
-  render() {
+  // В данном проекте у меня нет сервера на который отправляются данные
+  // поэтому я не вижу никакого смысла оборачивать инпут в <form></form> =)
+  onEnter = (e) => {
     const { onTaskAdded } = this.props;
 
+    if (e.target.value.match(/^[ ]+$/)) return;
+    if (e.key === 'Enter' && e.target.value) {
+      onTaskAdded(e.target.value);
+      e.target.value = '';
+    }
+  };
+
+  render() {
     const placeholder = 'What needs to be done?';
 
     return (
       <header className="header">
         <h1>Todo App</h1>
-        <input
-          className="new-todo"
-          placeholder={placeholder}
-          onKeyDown={(e) => {
-            if (e.target.value.match(/^[ ]+$/)) return;
-            if (e.key === 'Enter' && e.target.value) {
-              onTaskAdded(e.target.value.trim());
-              e.target.value = '';
-            }
-          }}
-        />
+        <input className="new-todo" placeholder={placeholder} onKeyDown={this.onEnter} />
       </header>
     );
   }
