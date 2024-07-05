@@ -12,10 +12,24 @@ class TodoApp extends React.Component {
     super();
 
     this.state = {
-      todoList: [],
-      todoListCount: 0,
-      filter: 'all', // all, active or completed
+      todoList: TodoApp.getStateFromLocalStorage('todoList', []),
+      todoListCount: TodoApp.getStateFromLocalStorage('todoListCount', 0),
+      filter: TodoApp.getStateFromLocalStorage('filter', 'all'),
     };
+  }
+
+  static getStateFromLocalStorage(key = '', defaultState = null) {
+    return localStorage.getItem(key)
+      ? JSON.parse(localStorage.getItem(key))
+      : defaultState;
+  }
+
+  componentDidUpdate() {
+    const { todoList, todoListCount, filter } = this.state;
+
+    localStorage.setItem('todoList', JSON.stringify(todoList));
+    localStorage.setItem('todoListCount', JSON.stringify(todoListCount));
+    localStorage.setItem('filter', JSON.stringify(filter));
   }
 
   addTask = (text) => {

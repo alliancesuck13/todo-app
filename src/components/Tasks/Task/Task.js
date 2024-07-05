@@ -8,7 +8,8 @@ import './Task.css';
 class Task extends React.Component {
   static propTypes = {
     content: PropTypes.string,
-    creationDate: PropTypes.instanceOf(Date),
+    // eslint-disable-next-line react/forbid-prop-types
+    creationDate: PropTypes.any, // проверка на такой тип запрещена
     isChecked: PropTypes.bool,
     onDelete: PropTypes.func,
     onComplete: PropTypes.func,
@@ -70,12 +71,11 @@ class Task extends React.Component {
         <div className="view">
           <input
             className="toggle"
-            id="toggleID"
             type="checkbox"
             onClick={onComplete}
             defaultChecked={isChecked}
           />
-          <label htmlFor="toggleID">
+          <label>
             <span className="description">{content}</span>
             <span className="created">{createdAt}</span>
           </label>
