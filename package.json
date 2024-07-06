@@ -21,7 +21,7 @@
     "lint": "eslint ./src",
     "lint:fix": "eslint ./src --fix",
     "format": "prettier - write ./src",
-    "prepare": "husky"
+    "prepare": "npx husky init"
   },
   "eslintConfig": {
     "extends": [
