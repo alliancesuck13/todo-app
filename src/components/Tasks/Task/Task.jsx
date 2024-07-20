@@ -1,9 +1,9 @@
 /* eslint-disable react/prefer-stateless-function */
-import React from 'react';
-import { formatDistanceToNow } from 'date-fns';
-import PropTypes from 'prop-types';
+import React from "react";
+import { format, formatDistanceToNow } from "date-fns";
+import PropTypes from "prop-types";
 
-import './Task.css';
+import "./Task.css";
 
 class Task extends React.Component {
   static propTypes = {
@@ -18,7 +18,7 @@ class Task extends React.Component {
   };
 
   static defaultProps = {
-    content: 'Lorem',
+    content: "Lorem",
     creationDate: new Date(),
     isChecked: false,
     onDelete: () => {
@@ -47,24 +47,31 @@ class Task extends React.Component {
 
   keyDown = (e) => {
     const { onEdit, handleEditTask } = this.props;
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       if (e.target.value.length === 0) return;
       if (e.target.value.match(/^[ ]+$/)) return;
       onEdit(e.target.value);
       handleEditTask();
     }
-    if (e.key === 'Escape') handleEditTask();
+    if (e.key === "Escape") handleEditTask();
   };
 
   render() {
-    const { content, creationDate, isChecked, onDelete, onComplete, handleEditTask } =
-      this.props;
+    const {
+      content,
+      creationDate,
+      timeInTimer,
+      isChecked,
+      onDelete,
+      onComplete,
+      handleEditTask,
+    } = this.props;
 
     const createdAt = formatDistanceToNow(new Date(creationDate), { addSuffix: true });
     const hide = {};
 
-    if (isChecked) hide.display = 'none';
-    else hide.display = '';
+    if (isChecked) hide.display = "none";
+    else hide.display = "";
 
     return (
       <>
@@ -76,8 +83,15 @@ class Task extends React.Component {
             defaultChecked={isChecked}
           />
           <label>
-            <span className="description">{content}</span>
-            <span className="created">{createdAt}</span>
+            <span className="title">{content}</span>
+            <span className="description">
+              <button type="button" className="icon icon-play"></button>
+              <button type="button" className="icon icon-pause"></button>
+              {timeInTimer === null
+                ? format(new Date(0, 0, 0, 0, 0, 0), "mm:ss")
+                : timeInTimer}
+            </span>
+            <span className="description">{createdAt}</span>
           </label>
           <button
             className="icon icon-edit"

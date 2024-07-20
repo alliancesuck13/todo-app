@@ -1,24 +1,24 @@
-import React from 'react';
+import React from "react";
 
-import TaskList from '../Tasks/TaskList';
-import NewTaskForm from '../NewTaskForm';
-import Footer from '../Footer';
+import TaskList from "../Tasks/TaskList";
+import NewTaskForm from "../NewTaskForm";
+import Footer from "../Footer";
 
-import generateUniqueID from './utils/generateUniqueID';
-import './TodoApp.css';
+import generateUniqueID from "./utils/generateUniqueID";
+import "./TodoApp.css";
 
 class TodoApp extends React.Component {
   constructor() {
     super();
 
     this.state = {
-      todoList: TodoApp.getStateFromLocalStorage('todoList', []),
-      todoListCount: TodoApp.getStateFromLocalStorage('todoListCount', 0),
-      filter: TodoApp.getStateFromLocalStorage('filter', 'all'),
+      todoList: TodoApp.getStateFromLocalStorage("todoList", []),
+      todoListCount: TodoApp.getStateFromLocalStorage("todoListCount", 0),
+      filter: TodoApp.getStateFromLocalStorage("filter", "all"),
     };
   }
 
-  static getStateFromLocalStorage(key = '', defaultState = null) {
+  static getStateFromLocalStorage(key = "", defaultState = null) {
     return localStorage.getItem(key)
       ? JSON.parse(localStorage.getItem(key))
       : defaultState;
@@ -27,18 +27,19 @@ class TodoApp extends React.Component {
   componentDidUpdate() {
     const { todoList, todoListCount, filter } = this.state;
 
-    localStorage.setItem('todoList', JSON.stringify(todoList));
-    localStorage.setItem('todoListCount', JSON.stringify(todoListCount));
-    localStorage.setItem('filter', JSON.stringify(filter));
+    localStorage.setItem("todoList", JSON.stringify(todoList));
+    localStorage.setItem("todoListCount", JSON.stringify(todoListCount));
+    localStorage.setItem("filter", JSON.stringify(filter));
   }
 
-  addTask = (text) => {
+  addTask = (text, time) => {
     const newTask = {
       id: generateUniqueID(),
       content: text,
       isEditing: false,
       isActive: true,
       creationDate: new Date(),
+      timeToDoTask: time,
     };
 
     this.setState((prevState) => {
@@ -123,15 +124,15 @@ class TodoApp extends React.Component {
   };
 
   handleRenderAllTasks = () => {
-    this.setState({ filter: 'all' });
+    this.setState({ filter: "all" });
   };
 
   handleRenderActiveTasks = () => {
-    this.setState({ filter: 'active' });
+    this.setState({ filter: "active" });
   };
 
   handleRenderCompletedTasks = () => {
-    this.setState({ filter: 'completed' });
+    this.setState({ filter: "completed" });
   };
 
   handleClearCompleted = () => {
@@ -164,9 +165,9 @@ class TodoApp extends React.Component {
     const { todoListCount, filter } = this.state;
     let filteredTodoList = [];
 
-    if (filter === 'completed') {
+    if (filter === "completed") {
       filteredTodoList = this.renderCompletedTasks();
-    } else if (filter === 'active') {
+    } else if (filter === "active") {
       filteredTodoList = this.renderActiveTasks();
     } else {
       filteredTodoList = this.renderAllTasks();

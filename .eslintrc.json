@@ -6,6 +6,7 @@
   "ignorePatterns": ["node_modules", "dist", "build"],
   "extends": [
     "airbnb",
+    "airbnb/hooks",
     "eslint:recommended",
     "plugin:react/recommended",
     "plugin:prettier/recommended",
@@ -13,7 +14,14 @@
     "plugin:import/warnings",
     "plugin:react-hooks/recommended"
   ],
+  "parser": "@babel/eslint-parser",
   "parserOptions": {
+    "requireConfigFile": false,
+    "babelOptions": {
+      "babelrc": false,
+      "configFile": false,
+      "presets": ["@babel/preset-react"]
+    },
     "ecmaFeatures": {
       "jsx": true,
       "useJSXTextNode": true
@@ -28,15 +36,16 @@
     "prettier/prettier": [
       "error",
       {
-        "endOfLine": "auto"
+        "endOfLine": "auto",
+        "singleQuote": false
       }
     ],
     "react/static-property-placement": ["error", "static public field"],
     "jsx-a11y/label-has-associated-control": 0,
     "jsx-a11y/control-has-associated-label": 0,
-    "linebreak-style": [0, "windows"],
+    "linebreak-style": [0, "unix"],
     "react/self-closing-comp": "off",
-    "quotes": ["error", "single"],
+    "quotes": ["error", "double"],
     "react/react-in-jsx-scope": "off",
     "react/prop-types": 0,
     "import/no-unresolved": [2, { "caseSensitive": false }],

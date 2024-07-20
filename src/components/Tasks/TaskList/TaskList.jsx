@@ -1,9 +1,9 @@
 /* eslint-disable react/prefer-stateless-function */
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import Task from '../Task';
-import './TaskList.css';
+import Task from "../Task";
+import "./TaskList.css";
 
 class TaskList extends React.Component {
   static propTypes = {
@@ -18,21 +18,21 @@ class TaskList extends React.Component {
     todoList: [
       {
         id: 1,
-        content: 'Fix bugs',
+        content: "Fix bugs",
         isEditing: false,
         isActive: true,
         creationDate: new Date(),
       },
       {
         id: 2,
-        content: 'Watch to your code',
+        content: "Watch to your code",
         isEditing: false,
         isActive: true,
         creationDate: new Date(),
       },
       {
         id: 3,
-        content: 'Being stupid',
+        content: "Being stupid",
         isEditing: false,
         isActive: false,
         creationDate: new Date(),
@@ -57,16 +57,17 @@ class TaskList extends React.Component {
       this.props;
 
     const todoItems = todoList.map((item) => {
-      let taskClassName = '';
-      if (item.isActive) taskClassName = '';
-      if (item.isActive && item.isEditing) taskClassName = ' editing';
-      if (!item.isActive) taskClassName = 'completed';
+      let taskClassName = "";
+      if (item.isActive) taskClassName = "";
+      if (item.isActive && item.isEditing) taskClassName = " editing";
+      if (!item.isActive) taskClassName = "completed";
 
       return (
         <li className={taskClassName} key={item.id}>
           <Task
             content={item.content}
             creationDate={item.creationDate}
+            timeInTimer={item.timeToDoTask}
             isChecked={!item.isActive}
             onDelete={() => onTaskDeleted(item.id)}
             onDeleteCompletedTasks={() => onTaskCompleted(item.id)}
