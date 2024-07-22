@@ -1,4 +1,6 @@
+/* eslint-disable react/no-unused-state */
 import React from "react";
+import { format } from "date-fns";
 
 import TaskList from "../Tasks/TaskList";
 import NewTaskForm from "../NewTaskForm";
@@ -39,7 +41,8 @@ class TodoApp extends React.Component {
       isEditing: false,
       isActive: true,
       creationDate: new Date(),
-      timeToDoTask: time,
+      timeToDoTask: format(time, "mm:ss"),
+      timerIsStarted: true,
     };
 
     this.setState((prevState) => {
@@ -104,6 +107,38 @@ class TodoApp extends React.Component {
       return {
         todoList: updatedTodoList,
         todoListCount: updatedCount,
+      };
+    });
+  };
+
+  stopTimerOnTask = (id) => {
+    const { todoList } = this.state;
+    this.setState(() => {
+      const updatedTodoList = todoList.map((task) => {
+        if (task.id === id) {
+          return { ...task, timerIsStarted: false };
+        }
+        return task;
+      });
+
+      return {
+        todoList: updatedTodoList,
+      };
+    });
+  };
+
+  startTimerOnTask = (id) => {
+    const { todoList } = this.state;
+    this.setState(() => {
+      const updatedTodoList = todoList.map((task) => {
+        if (task.id === id) {
+          return { ...task, timerIsStarted: true };
+        }
+        return task;
+      });
+
+      return {
+        todoList: updatedTodoList,
       };
     });
   };
@@ -182,6 +217,8 @@ class TodoApp extends React.Component {
             onTaskDeleted={this.deleteTask}
             onTaskCompleted={this.completeTask}
             onTaskEdited={this.editTask}
+            onTimerTaskStoped={this.stopTimerOnTask}
+            onTimerTaskStarted={this.startTimerOnTask}
             handleEditTask={this.handleEditTask}
           />
           <Footer

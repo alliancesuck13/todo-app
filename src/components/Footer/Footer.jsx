@@ -1,9 +1,9 @@
 /* eslint-disable react/prefer-stateless-function */
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import TaskFilter from './TaskFilter';
-import './Footer.css';
+import TaskFilter from "./TaskFilter";
+import "./Footer.css";
 
 class Footer extends React.Component {
   static propTypes = {
@@ -29,7 +29,7 @@ class Footer extends React.Component {
     handleRenderActiveTasks: () => {
       throw new TypeError(`Отсутствует prop handleRenderActiveTasks в ${this}`);
     },
-    filter: '',
+    filter: "",
   };
 
   render() {

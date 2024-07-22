@@ -1,10 +1,8 @@
 /* eslint-disable react/prefer-stateless-function */
 import React from "react";
 import PropTypes from "prop-types";
-import { format } from "date-fns";
 
 import "./NewTaskForm.css";
-// import TaskTimer from "./TaskTimer";
 
 class NewTaskForm extends React.Component {
   static propTypes = {
@@ -22,8 +20,8 @@ class NewTaskForm extends React.Component {
 
     this.state = {
       taskValue: "",
-      minutesValue: "0",
-      secondsValue: "0",
+      minutesValue: "",
+      secondsValue: "",
     };
   }
 
@@ -39,11 +37,12 @@ class NewTaskForm extends React.Component {
     const seconds =
       +secondsValue >= 3600 ? (minutes = "59") && (secondsValue = "59") : secondsValue;
 
-    const time = format(new Date(0, 0, 0, 0, minutes, seconds), "mm:ss");
+    const time = new Date(0, 0, 0, 0, minutes, seconds);
 
-    if (taskValue.length) onTaskAdded(taskValue, time);
+    if (!taskValue.length) return;
+    onTaskAdded(taskValue, time);
 
-    this.setState({ taskValue: "" });
+    this.setState({ taskValue: "", minutesValue: "", secondsValue: "" });
   };
 
   onChangeTaskValue = (e) => {
@@ -53,20 +52,20 @@ class NewTaskForm extends React.Component {
 
   onChangeMinutes = (e) => {
     if (e.target.value.match(/^[ ]+$/)) return;
-    if (!e.target.value.match(/^\d+$/)) return;
-
-    this.setState({ minutesValue: e.target.value });
+    if (e.target.value.match(/^\d+$/) || e.target.value === "") {
+      this.setState({ minutesValue: e.target.value });
+    }
   };
 
   onChangeSeconds = (e) => {
     if (e.target.value.match(/^[ ]+$/)) return;
-    if (!e.target.value.match(/^\d+$/)) return;
-
-    this.setState({ secondsValue: e.target.value });
+    if (e.target.value.match(/^\d+$/) || e.target.value === "") {
+      this.setState({ secondsValue: e.target.value });
+    }
   };
 
   render() {
-    const { taskValue } = this.state;
+    const { taskValue, minutesValue, secondsValue } = this.state;
     const placeholder = "What needs to be done?";
 
     return (
@@ -85,12 +84,14 @@ class NewTaskForm extends React.Component {
             placeholder="Min"
             onChange={this.onChangeMinutes}
             type="text"
+            value={minutesValue}
           />
           <input
             className="new-todo-form__timer"
             placeholder="Sec"
             onChange={this.onChangeSeconds}
             type="text"
+            value={secondsValue}
           />
           <button type="submit"></button>
         </form>

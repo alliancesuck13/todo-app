@@ -53,8 +53,15 @@ class TaskList extends React.Component {
   };
 
   render() {
-    const { todoList, onTaskDeleted, onTaskCompleted, onTaskEdited, handleEditTask } =
-      this.props;
+    const {
+      todoList,
+      onTaskDeleted,
+      onTaskCompleted,
+      onTaskEdited,
+      handleEditTask,
+      onTimerTaskStoped,
+      onTimerTaskStarted,
+    } = this.props;
 
     const todoItems = todoList.map((item) => {
       let taskClassName = "";
@@ -67,13 +74,16 @@ class TaskList extends React.Component {
           <Task
             content={item.content}
             creationDate={item.creationDate}
-            timeInTimer={item.timeToDoTask}
             isChecked={!item.isActive}
             onDelete={() => onTaskDeleted(item.id)}
             onDeleteCompletedTasks={() => onTaskCompleted(item.id)}
             onComplete={() => onTaskCompleted(item.id)}
             onEdit={(text) => onTaskEdited.call(this, item.id, text)}
             handleEditTask={() => handleEditTask(item.id)}
+            timeToDo={item.timeToDoTask}
+            timerIsStarted={item.timerIsStarted}
+            onStoped={() => onTimerTaskStoped(item.id)}
+            onStarted={() => onTimerTaskStarted(item.id)}
           />
         </li>
       );

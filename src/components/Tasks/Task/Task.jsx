@@ -35,14 +35,36 @@ class Task extends React.Component {
     },
   };
 
+  constructor() {
+    super();
+    this.state = {
+      timerToDo: null,
+      seconds: 0,
+    };
+  }
+
   componentDidMount() {
+    const { timeToDo } = this.props;
+
+    this.setState({ timerToDo: timeToDo });
+
     this.timerID = setInterval(() => {
       this.forceUpdate();
     }, 1000);
+
+    this.startTimer();
+  }
+
+  componentDidUpdate(prevProps) {
+    const { timerIsStarted } = this.props;
+    if (timerIsStarted !== prevProps.timerIsStarted) {
+      clearInterval(this.toDoTimerID);
+    }
   }
 
   componentWillUnmount() {
     clearInterval(this.timerID);
+    clearInterval(this.toDoTimerID);
   }
 
   keyDown = (e) => {
@@ -56,16 +78,43 @@ class Task extends React.Component {
     if (e.key === "Escape") handleEditTask();
   };
 
+  increaseSeconds = () => {
+    this.setState((prevState) => {
+      return { seconds: prevState.seconds + 1 };
+    });
+  };
+
+  startTimer = () => {
+    const { timeToDo, timerIsStarted } = this.props;
+    this.toDoTimerID = setInterval(() => {
+      this.increaseSeconds();
+      const { timerToDo, seconds } = this.state;
+      if (timerIsStarted) {
+        if (timeToDo === "00:00") {
+          if (timerToDo === "59:59") return;
+          const timeToDoArray = timeToDo.split(":");
+          const [minutes] = timeToDoArray;
+          const time = format(new Date(0, 0, 0, 0, minutes, seconds), "mm:ss");
+
+          this.setState({ timerToDo: time });
+        }
+      }
+    }, 1000);
+  };
+
   render() {
     const {
       content,
       creationDate,
-      timeInTimer,
       isChecked,
       onDelete,
       onComplete,
       handleEditTask,
+      onStoped,
+      onStarted,
     } = this.props;
+
+    const { timerToDo } = this.state;
 
     const createdAt = formatDistanceToNow(new Date(creationDate), { addSuffix: true });
     const hide = {};
@@ -85,11 +134,17 @@ class Task extends React.Component {
           <label>
             <span className="title">{content}</span>
             <span className="description">
-              <button type="button" className="icon icon-play"></button>
-              <button type="button" className="icon icon-pause"></button>
-              {timeInTimer === null
-                ? format(new Date(0, 0, 0, 0, 0, 0), "mm:ss")
-                : timeInTimer}
+              <button
+                type="button"
+                className="icon icon-play"
+                onClick={onStarted}
+              ></button>
+              <button
+                type="button"
+                className="icon icon-pause"
+                onClick={onStoped}
+              ></button>
+              {timerToDo}
             </span>
             <span className="description">{createdAt}</span>
           </label>
