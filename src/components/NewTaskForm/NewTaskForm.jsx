@@ -37,9 +37,12 @@ class NewTaskForm extends React.Component {
     const seconds =
       +secondsValue >= 3600 ? (minutes = "59") && (secondsValue = "59") : secondsValue;
 
-    const time = new Date(0, 0, 0, 0, minutes, seconds);
+    let time = new Date(0, 0, 0, 0, minutes, seconds);
+    if (minutes === "") time = new Date(0, 0, 0, 0, 0, seconds);
+    if (seconds === "") time = new Date(0, 0, 0, 0, minutes, 0);
+    if (minutes === "" && seconds === "") time = new Date(0, 0, 0, 0, 0, 0);
 
-    if (!taskValue.length) return;
+    if (!taskValue.length || (!minutesValue.length && !secondsValue.length)) return;
     onTaskAdded(taskValue, time);
 
     this.setState({ taskValue: "", minutesValue: "", secondsValue: "" });

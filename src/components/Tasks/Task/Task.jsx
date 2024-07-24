@@ -1,6 +1,6 @@
 /* eslint-disable react/prefer-stateless-function */
 import React from "react";
-import { format, formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow, getMinutes, getSeconds, getTime } from "date-fns";
 import PropTypes from "prop-types";
 
 import "./Task.css";
@@ -38,33 +38,30 @@ class Task extends React.Component {
   constructor() {
     super();
     this.state = {
-      timerToDo: null,
-      seconds: 0,
+      date: getTime(new Date()),
+      originDate: getTime(new Date()),
+      isStarted: true,
     };
   }
 
   componentDidMount() {
     const { timeToDo } = this.props;
+    this.setState({ date: getTime(timeToDo) });
 
-    this.setState({ timerToDo: timeToDo });
+    if (getTime(timeToDo) === -2209097486000) {
+      this.setState({ originDate: getTime(timeToDo) });
+    }
 
     this.timerID = setInterval(() => {
       this.forceUpdate();
     }, 1000);
 
-    this.startTimer();
-  }
-
-  componentDidUpdate(prevProps) {
-    const { timerIsStarted } = this.props;
-    if (timerIsStarted !== prevProps.timerIsStarted) {
-      clearInterval(this.toDoTimerID);
-    }
+    this.dateTimer = setInterval(this.timer, 1000);
   }
 
   componentWillUnmount() {
     clearInterval(this.timerID);
-    clearInterval(this.toDoTimerID);
+    clearInterval(this.dateTimer);
   }
 
   keyDown = (e) => {
@@ -78,45 +75,67 @@ class Task extends React.Component {
     if (e.key === "Escape") handleEditTask();
   };
 
-  increaseSeconds = () => {
-    this.setState((prevState) => {
-      return { seconds: prevState.seconds + 1 };
-    });
+  timer = () => {
+    const { setNewTimerTask, timerIsStarted } = this.props;
+    const { date, originDate } = this.state;
+    let newDate = new Date();
+
+    if (!timerIsStarted) return;
+
+    if (getTime(originDate) === -2209097486000) {
+      this.setState({ date: originDate });
+      this.setState((prevState) => {
+        if (getMinutes(date) === 59 && getSeconds(date) === 59) return null;
+        newDate = prevState.date + 1000;
+        setNewTimerTask(newDate);
+
+        return {
+          date: newDate,
+        };
+      });
+    }
+
+    if (getTime(originDate) !== -2209097486000) {
+      this.setState((prevState) => {
+        if (getMinutes(date) === 0 && getSeconds(date) === 0) return null;
+
+        newDate = prevState.date - 1000;
+        setNewTimerTask(newDate);
+
+        return {
+          date: newDate,
+        };
+      });
+    }
   };
 
-  startTimer = () => {
-    const { timeToDo, timerIsStarted } = this.props;
-    this.toDoTimerID = setInterval(() => {
-      this.increaseSeconds();
-      const { timerToDo, seconds } = this.state;
-      if (timerIsStarted) {
-        if (timeToDo === "00:00") {
-          if (timerToDo === "59:59") return;
-          const timeToDoArray = timeToDo.split(":");
-          const [minutes] = timeToDoArray;
-          const time = format(new Date(0, 0, 0, 0, minutes, seconds), "mm:ss");
+  onStart = () => {
+    const { onStarted } = this.props;
+    const { isStarted } = this.state;
 
-          this.setState({ timerToDo: time });
-        }
-      }
-    }, 1000);
+    onStarted();
+    this.setState({ isStarted: true });
+    if (!isStarted) {
+      this.dateTimer = setInterval(this.timer, 1000);
+    }
+  };
+
+  onStop = () => {
+    const { onStoped } = this.props;
+
+    onStoped();
+    this.setState({ isStarted: false });
+    clearInterval(this.dateTimer);
   };
 
   render() {
-    const {
-      content,
-      creationDate,
-      isChecked,
-      onDelete,
-      onComplete,
-      handleEditTask,
-      onStoped,
-      onStarted,
-    } = this.props;
+    const { content, creationDate, isChecked, onDelete, onComplete, handleEditTask } =
+      this.props;
 
-    const { timerToDo } = this.state;
+    const { date } = this.state;
 
     const createdAt = formatDistanceToNow(new Date(creationDate), { addSuffix: true });
+    const timer = format(date, "mm:ss");
     const hide = {};
 
     if (isChecked) hide.display = "none";
@@ -137,14 +156,14 @@ class Task extends React.Component {
               <button
                 type="button"
                 className="icon icon-play"
-                onClick={onStarted}
+                onClickCapture={this.onStart}
               ></button>
               <button
                 type="button"
                 className="icon icon-pause"
-                onClick={onStoped}
+                onClickCapture={this.onStop}
               ></button>
-              {timerToDo}
+              {timer}
             </span>
             <span className="description">{createdAt}</span>
           </label>

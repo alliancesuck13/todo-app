@@ -61,6 +61,8 @@ class TaskList extends React.Component {
       handleEditTask,
       onTimerTaskStoped,
       onTimerTaskStarted,
+      setNewTimerTask,
+      filter,
     } = this.props;
 
     const todoItems = todoList.map((item) => {
@@ -84,6 +86,10 @@ class TaskList extends React.Component {
             timerIsStarted={item.timerIsStarted}
             onStoped={() => onTimerTaskStoped(item.id)}
             onStarted={() => onTimerTaskStarted(item.id)}
+            setNewTimerTask={(timestamp) =>
+              setNewTimerTask.call(this, item.id, timestamp)
+            }
+            filter={filter}
           />
         </li>
       );

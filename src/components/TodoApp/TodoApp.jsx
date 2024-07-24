@@ -1,6 +1,7 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unused-state */
 import React from "react";
-import { format } from "date-fns";
+import { getTime } from "date-fns";
 
 import TaskList from "../Tasks/TaskList";
 import NewTaskForm from "../NewTaskForm";
@@ -17,6 +18,7 @@ class TodoApp extends React.Component {
       todoList: TodoApp.getStateFromLocalStorage("todoList", []),
       todoListCount: TodoApp.getStateFromLocalStorage("todoListCount", 0),
       filter: TodoApp.getStateFromLocalStorage("filter", "all"),
+      dateOfTasks: TodoApp.getStateFromLocalStorage("dateOfTasks", []),
     };
   }
 
@@ -26,12 +28,47 @@ class TodoApp extends React.Component {
       : defaultState;
   }
 
+  // ToDo: УМЕНЬШЕНИЕ ТАЙМЕРА ПРИ ПЕРЕКЛЮЧЕНИИ ФИЛЬТРОВ: ПЕРЕНЕСТИ DATEOFTASKS В ADDTASK
+
+  // componentDidMount() {
+  //   this.timerID = setInterval(() => {
+  //     // this.setState((prevState) => {
+  //     //   const updatedDateOfTasks = prevState.dateOfTasks.map((task) => {
+  //     //     const id = Object.keys(task)[0];
+  //     //     return { task: prevState.id - 1000 };
+  //     //   });
+
+  //     //   return {
+  //     //     dateOfTasks: updatedDateOfTasks,
+  //     //   };
+  //     // });
+  //     // const { todoList, filter } = this.state;
+  //     // this.setState((prevState) => {
+  //     //   const updatedDateOfTasks = prevState.dateOfTasks.map((taskDate) => {
+  //     //     if (todoList.length !== prevState.todoList.length && filter !== "all") {
+  //     //       if (taskDate.isTimerStarted) {
+  //     //         return { ...taskDate, value: prevState.taskDate.value - 1000 };
+  //     //       }
+  //     //     }
+  //     //     return taskDate;
+  //     //   });
+
+  //     //   return {
+  //     //     dateOfTasks: updatedDateOfTasks,
+  //     //   };
+  //     // });
+
+  //     this.forceUpdate();
+  //   }, 1000);
+  // }
+
   componentDidUpdate() {
-    const { todoList, todoListCount, filter } = this.state;
+    const { todoList, todoListCount, filter, dateOfTasks } = this.state;
 
     localStorage.setItem("todoList", JSON.stringify(todoList));
     localStorage.setItem("todoListCount", JSON.stringify(todoListCount));
     localStorage.setItem("filter", JSON.stringify(filter));
+    localStorage.setItem("dateOfTasks", JSON.stringify(dateOfTasks));
   }
 
   addTask = (text, time) => {
@@ -41,7 +78,7 @@ class TodoApp extends React.Component {
       isEditing: false,
       isActive: true,
       creationDate: new Date(),
-      timeToDoTask: format(time, "mm:ss"),
+      timeToDoTask: time,
       timerIsStarted: true,
     };
 
@@ -52,6 +89,28 @@ class TodoApp extends React.Component {
       return {
         todoList: updatedTodoList,
         todoListCount: updatedCount,
+      };
+    });
+  };
+
+  addDateOfTasks = () => {
+    this.setState((prevState) => {
+      let timers = prevState.todoList.map((task) => {
+        return [task.id, task.timeToDoTask, task.timerIsStarted];
+      });
+
+      timers = timers.map((date) => {
+        const obj = {};
+        const [id, timestamp, isTimerStarted] = date;
+
+        obj.id = id;
+        obj.value = getTime(timestamp);
+        obj.isTimerStarted = isTimerStarted;
+
+        return obj;
+      });
+      return {
+        dateOfTasks: timers,
       };
     });
   };
@@ -143,6 +202,21 @@ class TodoApp extends React.Component {
     });
   };
 
+  setNewTimerTask = (id, timestamp) => {
+    const { todoList } = this.state;
+    this.setState(() => {
+      const updatedTodoList = todoList.map((task) => {
+        if (task.id === id) {
+          return { ...task, timeToDoTask: timestamp };
+        }
+        return task;
+      });
+      return {
+        todoList: updatedTodoList,
+      };
+    });
+  };
+
   renderAllTasks = () => {
     const { todoList } = this.state;
     return todoList;
@@ -160,14 +234,17 @@ class TodoApp extends React.Component {
 
   handleRenderAllTasks = () => {
     this.setState({ filter: "all" });
+    this.addDateOfTasks();
   };
 
   handleRenderActiveTasks = () => {
     this.setState({ filter: "active" });
+    this.addDateOfTasks();
   };
 
   handleRenderCompletedTasks = () => {
     this.setState({ filter: "completed" });
+    this.addDateOfTasks();
   };
 
   handleClearCompleted = () => {
@@ -220,6 +297,8 @@ class TodoApp extends React.Component {
             onTimerTaskStoped={this.stopTimerOnTask}
             onTimerTaskStarted={this.startTimerOnTask}
             handleEditTask={this.handleEditTask}
+            setNewTimerTask={this.setNewTimerTask}
+            filter={filter}
           />
           <Footer
             todoListCount={todoListCount}
