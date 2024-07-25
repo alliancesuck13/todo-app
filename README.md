@@ -1,4 +1,4 @@
-<h1 align="center"><a href="https://kitt-todoapp.vercel.app/">Todo App📒</a></h1>
+<h1 align="center"><a href="https://kitt-todoapp.vercel.app/">Todo App With Timer📒⏲</a></h1>
 
 <h2 align="center">
   <p>Todo App приложение, написанное на React <i>(на классах)</i></p>
