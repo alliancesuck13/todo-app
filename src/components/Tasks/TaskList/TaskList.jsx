@@ -63,6 +63,7 @@ class TaskList extends React.Component {
       onTimerTaskStarted,
       setNewTimerTask,
       filter,
+      completeTaskWhenTimerEnd,
     } = this.props;
 
     const todoItems = todoList.map((item) => {
@@ -90,6 +91,7 @@ class TaskList extends React.Component {
               setNewTimerTask.call(this, item.id, timestamp)
             }
             filter={filter}
+            completeTaskWhenTimerEnd={() => completeTaskWhenTimerEnd(item.id)}
           />
         </li>
       );

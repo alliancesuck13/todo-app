@@ -39,18 +39,13 @@ class Task extends React.Component {
     super();
     this.state = {
       date: getTime(new Date()),
-      originDate: getTime(new Date()),
       isStarted: true,
     };
   }
 
   componentDidMount() {
-    const { timeToDo } = this.props;
-    this.setState({ date: getTime(timeToDo) });
-
-    if (getTime(timeToDo) === -2209097486000) {
-      this.setState({ originDate: getTime(timeToDo) });
-    }
+    const { timeToDo, timerIsStarted } = this.props;
+    this.setState({ date: getTime(timeToDo), isStarted: timerIsStarted });
 
     this.timerID = setInterval(() => {
       this.forceUpdate();
@@ -76,37 +71,25 @@ class Task extends React.Component {
   };
 
   timer = () => {
-    const { setNewTimerTask, timerIsStarted } = this.props;
-    const { date, originDate } = this.state;
+    const { setNewTimerTask, timerIsStarted, completeTaskWhenTimerEnd } = this.props;
+    const { date } = this.state;
     let newDate = new Date();
 
     if (!timerIsStarted) return;
 
-    if (getTime(originDate) === -2209097486000) {
-      this.setState({ date: originDate });
-      this.setState((prevState) => {
-        if (getMinutes(date) === 59 && getSeconds(date) === 59) return null;
-        newDate = prevState.date + 1000;
-        setNewTimerTask(newDate);
+    this.setState((prevState) => {
+      if (getMinutes(date) === 0 && getSeconds(date) === 0) {
+        completeTaskWhenTimerEnd();
+        return null;
+      }
 
-        return {
-          date: newDate,
-        };
-      });
-    }
+      newDate = prevState.date - 1000;
+      setNewTimerTask(newDate);
 
-    if (getTime(originDate) !== -2209097486000) {
-      this.setState((prevState) => {
-        if (getMinutes(date) === 0 && getSeconds(date) === 0) return null;
-
-        newDate = prevState.date - 1000;
-        setNewTimerTask(newDate);
-
-        return {
-          date: newDate,
-        };
-      });
-    }
+      return {
+        date: newDate,
+      };
+    });
   };
 
   onStart = () => {
@@ -128,18 +111,26 @@ class Task extends React.Component {
     clearInterval(this.dateTimer);
   };
 
+  onCompleteTask = () => {
+    const { onComplete, timerIsStarted } = this.props;
+    clearInterval(this.dateTimer);
+
+    if (timerIsStarted) {
+      this.dateTimer = setInterval(this.timer, 1000);
+    }
+
+    this.setState({ isStarted: false });
+
+    onComplete();
+  };
+
   render() {
-    const { content, creationDate, isChecked, onDelete, onComplete, handleEditTask } =
-      this.props;
+    const { content, creationDate, isChecked, onDelete, handleEditTask } = this.props;
 
     const { date } = this.state;
 
     const createdAt = formatDistanceToNow(new Date(creationDate), { addSuffix: true });
     const timer = format(date, "mm:ss");
-    const hide = {};
-
-    if (isChecked) hide.display = "none";
-    else hide.display = "";
 
     return (
       <>
@@ -147,32 +138,37 @@ class Task extends React.Component {
           <input
             className="toggle"
             type="checkbox"
-            onClick={onComplete}
+            onClick={this.onCompleteTask}
             defaultChecked={isChecked}
           />
           <label>
             <span className="title">{content}</span>
             <span className="description">
-              <button
-                type="button"
-                className="icon icon-play"
-                onClickCapture={this.onStart}
-              ></button>
-              <button
-                type="button"
-                className="icon icon-pause"
-                onClickCapture={this.onStop}
-              ></button>
+              {!isChecked ? (
+                <>
+                  <button
+                    type="button"
+                    className="icon icon-play"
+                    onClickCapture={this.onStart}
+                  ></button>
+                  <button
+                    type="button"
+                    className="icon icon-pause"
+                    onClickCapture={this.onStop}
+                  ></button>
+                </>
+              ) : null}
               {timer}
             </span>
             <span className="description">{createdAt}</span>
           </label>
-          <button
-            className="icon icon-edit"
-            style={hide}
-            type="button"
-            onClick={handleEditTask}
-          ></button>
+          {!isChecked ? (
+            <button
+              className="icon icon-edit"
+              type="button"
+              onClick={handleEditTask}
+            ></button>
+          ) : null}
           <button className="icon icon-destroy" type="button" onClick={onDelete}></button>
         </div>
         <input type="text" className="edit" onKeyDown={this.keyDown} />
