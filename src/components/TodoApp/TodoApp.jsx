@@ -36,7 +36,7 @@ class TodoApp extends React.Component {
       isActive: true,
       creationDate: new Date(),
       timeToDoTask: getTime(time),
-      timerIsStarted: true,
+      timerIsStarted: false,
     };
 
     this.setState((prevState) => {

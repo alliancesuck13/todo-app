@@ -39,19 +39,20 @@ class Task extends React.Component {
     super();
     this.state = {
       date: getTime(new Date()),
-      isStarted: true,
     };
   }
 
   componentDidMount() {
-    const { timeToDo, timerIsStarted } = this.props;
-    this.setState({ date: getTime(timeToDo), isStarted: timerIsStarted });
+    const { timeToDo, timerIsStarted, isChecked } = this.props;
+    this.setState({ date: getTime(timeToDo) });
 
     this.timerID = setInterval(() => {
       this.forceUpdate();
     }, 1000);
 
-    this.dateTimer = setInterval(this.timer, 1000);
+    if (timerIsStarted && !isChecked) {
+      this.dateTimer = setInterval(this.timer, 1000);
+    }
   }
 
   componentWillUnmount() {
@@ -93,13 +94,11 @@ class Task extends React.Component {
   };
 
   onStart = () => {
-    const { onStarted } = this.props;
-    const { isStarted } = this.state;
+    const { onStarted, timerIsStarted } = this.props;
 
-    onStarted();
-    this.setState({ isStarted: true });
-    if (!isStarted) {
+    if (!timerIsStarted) {
       this.dateTimer = setInterval(this.timer, 1000);
+      onStarted();
     }
   };
 
@@ -107,21 +106,22 @@ class Task extends React.Component {
     const { onStoped } = this.props;
 
     onStoped();
-    this.setState({ isStarted: false });
     clearInterval(this.dateTimer);
   };
 
   onCompleteTask = () => {
-    const { onComplete, timerIsStarted } = this.props;
-    clearInterval(this.dateTimer);
-
-    if (timerIsStarted) {
-      this.dateTimer = setInterval(this.timer, 1000);
-    }
-
-    this.setState({ isStarted: false });
+    const { onComplete, timerIsStarted, isChecked } = this.props;
+    // const { date } = this.state;
 
     onComplete();
+    // if (date === -2209097486000) {
+    //   clearInterval(this.dateTimer);
+    // }
+
+    clearInterval(this.dateTimer);
+    if (!timerIsStarted && isChecked) {
+      this.dateTimer = setInterval(this.timer, 1000);
+    }
   };
 
   render() {
@@ -140,6 +140,7 @@ class Task extends React.Component {
             type="checkbox"
             onClick={this.onCompleteTask}
             defaultChecked={isChecked}
+            checked={isChecked ? "true" : ""}
           />
           <label>
             <span className="title">{content}</span>
