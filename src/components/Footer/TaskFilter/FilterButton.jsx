@@ -1,9 +1,9 @@
 /* eslint-disable react/prefer-stateless-function */
-import React, { Children } from 'react';
+import React, { Children } from "react";
 
-import generateUniqueID from '../../TodoApp/utils/generateUniqueID';
+import generateUniqueID from "../../TodoApp/utils/generateUniqueID";
 
-import './FilterButton.css';
+import "./FilterButton.css";
 
 class FilterButton extends React.Component {
   render() {

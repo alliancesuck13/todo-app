@@ -1,34 +1,34 @@
-import randomInteger from './randomInteger';
+import randomInteger from "./randomInteger";
 
 export default function generateUniqueID() {
   const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const chars = [
-    'a',
-    'b',
-    'c',
-    'd',
-    'e',
-    'f',
-    'j',
-    'h',
-    'i',
-    'j',
-    'k',
-    'l',
-    'm',
-    'n',
-    'o',
-    'p',
-    'q',
-    'r',
-    's',
-    't',
-    'u',
-    'v',
-    'w',
-    'x',
-    'y',
-    'z',
+    "a",
+    "b",
+    "c",
+    "d",
+    "e",
+    "f",
+    "j",
+    "h",
+    "i",
+    "j",
+    "k",
+    "l",
+    "m",
+    "n",
+    "o",
+    "p",
+    "q",
+    "r",
+    "s",
+    "t",
+    "u",
+    "v",
+    "w",
+    "x",
+    "y",
+    "z",
   ];
 
   const uniqueID = [];
@@ -41,5 +41,5 @@ export default function generateUniqueID() {
     uniqueID.push(`${numbers[randomIndexForNumber]}${chars[randomIndexForChar]}`);
   }
 
-  return uniqueID.join('');
+  return uniqueID.join("");
 }

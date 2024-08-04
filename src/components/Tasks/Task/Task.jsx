@@ -1,9 +1,9 @@
 /* eslint-disable react/prefer-stateless-function */
-import React from 'react';
-import { formatDistanceToNow } from 'date-fns';
-import PropTypes from 'prop-types';
+import React from "react";
+import { format, formatDistanceToNow, getMinutes, getSeconds, getTime } from "date-fns";
+import PropTypes from "prop-types";
 
-import './Task.css';
+import "./Task.css";
 
 class Task extends React.Component {
   static propTypes = {
@@ -18,7 +18,7 @@ class Task extends React.Component {
   };
 
   static defaultProps = {
-    content: 'Lorem',
+    content: "Lorem",
     creationDate: new Date(),
     isChecked: false,
     onDelete: () => {
@@ -35,36 +35,102 @@ class Task extends React.Component {
     },
   };
 
+  constructor() {
+    super();
+    this.state = {
+      date: getTime(new Date()),
+    };
+  }
+
   componentDidMount() {
+    const { timeToDo, timerIsStarted, isChecked } = this.props;
+    this.setState({ date: getTime(timeToDo) });
+
     this.timerID = setInterval(() => {
       this.forceUpdate();
     }, 1000);
+
+    if (timerIsStarted && !isChecked) {
+      this.dateTimer = setInterval(this.timer, 1000);
+    }
   }
 
   componentWillUnmount() {
     clearInterval(this.timerID);
+    clearInterval(this.dateTimer);
   }
 
   keyDown = (e) => {
     const { onEdit, handleEditTask } = this.props;
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       if (e.target.value.length === 0) return;
       if (e.target.value.match(/^[ ]+$/)) return;
       onEdit(e.target.value);
       handleEditTask();
     }
-    if (e.key === 'Escape') handleEditTask();
+    if (e.key === "Escape") handleEditTask();
+  };
+
+  timer = () => {
+    const { setNewTimerTask, timerIsStarted, completeTaskWhenTimerEnd } = this.props;
+    const { date } = this.state;
+    let newDate = new Date();
+
+    if (!timerIsStarted) return;
+
+    this.setState((prevState) => {
+      if (getMinutes(date) === 0 && getSeconds(date) === 0) {
+        completeTaskWhenTimerEnd();
+        return null;
+      }
+
+      newDate = prevState.date - 1000;
+      setNewTimerTask(newDate);
+
+      return {
+        date: newDate,
+      };
+    });
+  };
+
+  onStart = () => {
+    const { onStarted, timerIsStarted } = this.props;
+
+    if (!timerIsStarted) {
+      this.dateTimer = setInterval(this.timer, 1000);
+      onStarted();
+    }
+  };
+
+  onStop = () => {
+    const { onStoped } = this.props;
+
+    onStoped();
+    clearInterval(this.dateTimer);
+  };
+
+  onCompleteTask = () => {
+    const { onComplete, timerIsStarted, isChecked } = this.props;
+    // const { date } = this.state;
+
+    onComplete();
+    // if (date === -2209097486000) {
+    //   clearInterval(this.dateTimer);
+    // }
+
+    clearInterval(this.dateTimer);
+    if (!timerIsStarted && isChecked) {
+      this.dateTimer = setInterval(this.timer, 1000);
+    }
   };
 
   render() {
-    const { content, creationDate, isChecked, onDelete, onComplete, handleEditTask } =
-      this.props;
+    const { content, creationDate, isChecked, onDelete, handleEditTask } = this.props;
+
+    const { date } = this.state;
 
     const createdAt = formatDistanceToNow(new Date(creationDate), { addSuffix: true });
-    const hide = {};
-
-    if (isChecked) hide.display = 'none';
-    else hide.display = '';
+    const timer = format(date, "mm:ss");
 
     return (
       <>
@@ -72,19 +138,38 @@ class Task extends React.Component {
           <input
             className="toggle"
             type="checkbox"
-            onClick={onComplete}
+            onClick={this.onCompleteTask}
             defaultChecked={isChecked}
+            checked={isChecked ? "true" : ""}
           />
           <label>
-            <span className="description">{content}</span>
-            <span className="created">{createdAt}</span>
+            <span className="title">{content}</span>
+            <span className="description">
+              {!isChecked ? (
+                <>
+                  <button
+                    type="button"
+                    className="icon icon-play"
+                    onClickCapture={this.onStart}
+                  ></button>
+                  <button
+                    type="button"
+                    className="icon icon-pause"
+                    onClickCapture={this.onStop}
+                  ></button>
+                </>
+              ) : null}
+              {timer}
+            </span>
+            <span className="description">{createdAt}</span>
           </label>
-          <button
-            className="icon icon-edit"
-            style={hide}
-            type="button"
-            onClick={handleEditTask}
-          ></button>
+          {!isChecked ? (
+            <button
+              className="icon icon-edit"
+              type="button"
+              onClick={handleEditTask}
+            ></button>
+          ) : null}
           <button className="icon icon-destroy" type="button" onClick={onDelete}></button>
         </div>
         <input type="text" className="edit" onKeyDown={this.keyDown} />
