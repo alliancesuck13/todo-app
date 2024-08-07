@@ -56,6 +56,8 @@ export default function TaskList({
   onTaskCompleted,
   onTaskEdited,
   handleEditTask,
+  handleStartTimer,
+  handleStopTimer,
 }) {
   const todoItems = todoList.map((item) => {
     let taskClassName = "";
@@ -75,6 +77,8 @@ export default function TaskList({
           onEdit={(text) => onTaskEdited.call(this, item.id, text)}
           handleEditTask={() => handleEditTask(item.id)}
           timeToDo={item.timeToDoTask}
+          onStartTimer={() => handleStartTimer(item.id)}
+          onStopTimer={() => handleStopTimer(item.id)}
         />
       </li>
     );

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { getTime } from "date-fns";
+import { getMinutes, getSeconds, getTime } from "date-fns";
 
 import TaskList from "../Tasks/TaskList";
 import NewTaskForm from "../NewTaskForm";
@@ -10,8 +10,12 @@ import "./TodoApp.css";
 
 export default function TodoApp() {
   const [todoList, setTodoList] = useState([]);
+
   const [todoListCount, setTodoListCount] = useState(0);
+
   const [filter, setFilter] = useState("all");
+
+  const [timerIDS, setTimerIDS] = useState([]);
 
   const addTask = (text, time) => {
     const newTask = {
@@ -51,24 +55,30 @@ export default function TodoApp() {
           return {
             ...task,
             isActive: !task.isActive,
-            timerIsStarted: !task.timerIsStarted,
           };
         }
 
         return task;
       })
     );
+
+    clearTaskTimer(id);
   };
 
   const deleteTask = (id) => {
+    let index = 0;
     setTodoList((prevList) => {
-      const index = prevList.findIndex((task) => task.id === id);
-      setTodoListCount((prevCount) => {
-        const updatedCount = todoList[index].isActive ? prevCount - 1 : prevCount;
-        return updatedCount;
-      });
+      index = prevList.findIndex((task) => task.id === id);
+
       return prevList.toSpliced(index, 1);
     });
+
+    setTodoListCount((prevCount) => {
+      const updatedCount = todoList[index].isActive ? prevCount - 1 : prevCount;
+      return updatedCount;
+    });
+
+    clearTaskTimer(id);
   };
 
   const renderAllTasks = () => {
@@ -115,6 +125,60 @@ export default function TodoApp() {
     );
   };
 
+  const handleStartTimer = (id) => {
+    let isTimerExists = false;
+
+    timerIDS.forEach((timerID) => {
+      if (Object.keys(timerID)[0] === id) isTimerExists = true;
+    });
+
+    if (!isTimerExists) {
+      const timer = setInterval(() => {
+        setTodoList((prevList) =>
+          prevList.map((task) => {
+            if (
+              task.id === id &&
+              !(
+                getMinutes(task.timeToDoTask) === 0 && getSeconds(task.timeToDoTask) === 0
+              )
+            ) {
+              return { ...task, timeToDoTask: task.timeToDoTask - 1000 };
+            }
+
+            if (
+              task.id === id &&
+              getMinutes(task.timeToDoTask) === 0 &&
+              getSeconds(task.timeToDoTask) === 0
+            ) {
+              clearTaskTimer(id);
+            }
+
+            return task;
+          })
+        );
+      }, 1000);
+
+      const newTimer = {};
+      newTimer[id] = timer;
+
+      setTimerIDS((prevTimers) => [...prevTimers, newTimer]);
+    }
+  };
+
+  const handleStopTimer = (id) => {
+    clearTaskTimer(id);
+  };
+
+  const clearTaskTimer = (id) => {
+    setTimerIDS((prevTimers) => {
+      prevTimers.forEach((timer) => {
+        if (Object.keys(timer)[0] === id) clearInterval(timer[id]);
+      });
+      const updatedTimers = prevTimers.filter((timer) => Object.keys(timer)[0] !== id);
+      return updatedTimers;
+    });
+  };
+
   let filteredTodoList = [];
 
   if (filter === "completed") {
@@ -135,6 +199,8 @@ export default function TodoApp() {
           onTaskCompleted={completeTask}
           onTaskEdited={editTask}
           handleEditTask={handleEditTask}
+          handleStartTimer={handleStartTimer}
+          handleStopTimer={handleStopTimer}
         />
         <Footer
           todoListCount={todoListCount}

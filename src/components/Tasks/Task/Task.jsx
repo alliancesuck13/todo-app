@@ -1,5 +1,5 @@
 import { Component, useEffect, useState } from "react";
-import { format, formatDistanceToNow } from "date-fns";
+import { format, formatDistanceToNow, getMinutes, getSeconds } from "date-fns";
 import PropTypes from "prop-types";
 
 import "./Task.css";
@@ -42,6 +42,8 @@ export default function Task({
   onComplete,
   onEdit,
   timeToDo,
+  onStartTimer,
+  onStopTimer,
 }) {
   const [seconds, setSeconds] = useState(0);
 
@@ -63,12 +65,12 @@ export default function Task({
     if (e.key === "Escape") handleEditTask();
   };
 
-  const onCompleteTask = () => {
-    onComplete();
-  };
-
   const createdAt = formatDistanceToNow(new Date(creationDate), { addSuffix: true });
-  const formatedTimeToDo = format(timeToDo, "mm:ss");
+  const timeIsOver = "Time is over!";
+  const formatedTimeToDo =
+    getMinutes(timeToDo) === 0 && getSeconds(timeToDo) === 0
+      ? timeIsOver
+      : format(timeToDo, "mm:ss");
   const checked = isChecked ? true : "";
 
   return (
@@ -77,7 +79,7 @@ export default function Task({
         <input
           className="toggle"
           type="checkbox"
-          onChange={onCompleteTask}
+          onChange={onComplete}
           checked={checked}
         />
         <label>
@@ -88,12 +90,12 @@ export default function Task({
                 <button
                   type="button"
                   className="icon icon-play"
-                  // onClickCapture={onStart}
+                  onClick={onStartTimer}
                 ></button>
                 <button
                   type="button"
                   className="icon icon-pause"
-                  // onClickCapture={onStop}
+                  onClick={onStopTimer}
                 ></button>
               </>
             ) : null}

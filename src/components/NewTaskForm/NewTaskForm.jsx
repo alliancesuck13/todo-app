@@ -9,7 +9,7 @@ Component.propTypes = {
 
 Component.defaultProps = {
   onTaskAdded: () => {
-    throw new TypeError(`Отсутствует prop добавления Task в ${this}`);
+    throw new TypeError("Отсутствует prop добавления Task в NewTaskForm");
   },
 };
 
