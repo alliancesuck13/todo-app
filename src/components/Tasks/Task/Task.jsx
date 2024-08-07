@@ -1,67 +1,59 @@
-/* eslint-disable react/prefer-stateless-function */
-import React from "react";
-import { format, formatDistanceToNow, getMinutes, getSeconds, getTime } from "date-fns";
+import { Component, useEffect, useState } from "react";
+import { format, formatDistanceToNow } from "date-fns";
 import PropTypes from "prop-types";
 
 import "./Task.css";
 
-class Task extends React.Component {
-  static propTypes = {
-    content: PropTypes.string,
-    // eslint-disable-next-line react/forbid-prop-types
-    creationDate: PropTypes.any, // проверка на такой тип запрещена
-    isChecked: PropTypes.bool,
-    onDelete: PropTypes.func,
-    onComplete: PropTypes.func,
-    onEdit: PropTypes.func,
-    handleEditTask: PropTypes.func,
-  };
+Component.propTypes = {
+  content: PropTypes.string,
+  // eslint-disable-next-line react/forbid-prop-types
+  creationDate: PropTypes.any, // проверка на такой тип запрещена
+  isChecked: PropTypes.bool,
+  onDelete: PropTypes.func,
+  onComplete: PropTypes.func,
+  onEdit: PropTypes.func,
+  handleEditTask: PropTypes.func,
+};
 
-  static defaultProps = {
-    content: "Lorem",
-    creationDate: new Date(),
-    isChecked: false,
-    onDelete: () => {
-      throw new TypeError(`Отсутствует prop onDelete в ${this}`);
-    },
-    onComplete: () => {
-      throw new TypeError(`Отсутствует prop onComplete в ${this}`);
-    },
-    onEdit: () => {
-      throw new TypeError(`Отсутствует prop onEdit в ${this}`);
-    },
-    handleEditTask: () => {
-      throw new TypeError(`Отсутствует prop handleEditTask в ${this}`);
-    },
-  };
+Component.defaultProps = {
+  content: "Lorem",
+  creationDate: new Date(),
+  isChecked: false,
+  onDelete: () => {
+    throw new TypeError(`Отсутствует prop onDelete в ${this}`);
+  },
+  onComplete: () => {
+    throw new TypeError(`Отсутствует prop onComplete в ${this}`);
+  },
+  onEdit: () => {
+    throw new TypeError(`Отсутствует prop onEdit в ${this}`);
+  },
+  handleEditTask: () => {
+    throw new TypeError(`Отсутствует prop handleEditTask в ${this}`);
+  },
+};
 
-  constructor() {
-    super();
-    this.state = {
-      date: getTime(new Date()),
+export default function Task({
+  content,
+  creationDate,
+  isChecked,
+  handleEditTask,
+  onDelete,
+  onComplete,
+  onEdit,
+  timeToDo,
+}) {
+  const [seconds, setSeconds] = useState(0);
+
+  useEffect(() => {
+    const timerID = setInterval(() => setSeconds((prevSeconds) => prevSeconds + 1), 1000);
+
+    return () => {
+      clearInterval(timerID);
     };
-  }
+  }, [seconds]);
 
-  componentDidMount() {
-    const { timeToDo, timerIsStarted, isChecked } = this.props;
-    this.setState({ date: getTime(timeToDo) });
-
-    this.timerID = setInterval(() => {
-      this.forceUpdate();
-    }, 1000);
-
-    if (timerIsStarted && !isChecked) {
-      this.dateTimer = setInterval(this.timer, 1000);
-    }
-  }
-
-  componentWillUnmount() {
-    clearInterval(this.timerID);
-    clearInterval(this.dateTimer);
-  }
-
-  keyDown = (e) => {
-    const { onEdit, handleEditTask } = this.props;
+  const keyDown = (e) => {
     if (e.key === "Enter") {
       if (e.target.value.length === 0) return;
       if (e.target.value.match(/^[ ]+$/)) return;
@@ -71,111 +63,54 @@ class Task extends React.Component {
     if (e.key === "Escape") handleEditTask();
   };
 
-  timer = () => {
-    const { setNewTimerTask, timerIsStarted, completeTaskWhenTimerEnd } = this.props;
-    const { date } = this.state;
-    let newDate = new Date();
-
-    if (!timerIsStarted) return;
-
-    this.setState((prevState) => {
-      if (getMinutes(date) === 0 && getSeconds(date) === 0) {
-        completeTaskWhenTimerEnd();
-        return null;
-      }
-
-      newDate = prevState.date - 1000;
-      setNewTimerTask(newDate);
-
-      return {
-        date: newDate,
-      };
-    });
-  };
-
-  onStart = () => {
-    const { onStarted, timerIsStarted } = this.props;
-
-    if (!timerIsStarted) {
-      this.dateTimer = setInterval(this.timer, 1000);
-      onStarted();
-    }
-  };
-
-  onStop = () => {
-    const { onStoped } = this.props;
-
-    onStoped();
-    clearInterval(this.dateTimer);
-  };
-
-  onCompleteTask = () => {
-    const { onComplete, timerIsStarted, isChecked } = this.props;
-    // const { date } = this.state;
-
+  const onCompleteTask = () => {
     onComplete();
-    // if (date === -2209097486000) {
-    //   clearInterval(this.dateTimer);
-    // }
-
-    clearInterval(this.dateTimer);
-    if (!timerIsStarted && isChecked) {
-      this.dateTimer = setInterval(this.timer, 1000);
-    }
   };
 
-  render() {
-    const { content, creationDate, isChecked, onDelete, handleEditTask } = this.props;
+  const createdAt = formatDistanceToNow(new Date(creationDate), { addSuffix: true });
+  const formatedTimeToDo = format(timeToDo, "mm:ss");
+  const checked = isChecked ? true : "";
 
-    const { date } = this.state;
-
-    const createdAt = formatDistanceToNow(new Date(creationDate), { addSuffix: true });
-    const timer = format(date, "mm:ss");
-
-    return (
-      <>
-        <div className="view">
-          <input
-            className="toggle"
-            type="checkbox"
-            onClick={this.onCompleteTask}
-            defaultChecked={isChecked}
-            checked={isChecked ? "true" : ""}
-          />
-          <label>
-            <span className="title">{content}</span>
-            <span className="description">
-              {!isChecked ? (
-                <>
-                  <button
-                    type="button"
-                    className="icon icon-play"
-                    onClickCapture={this.onStart}
-                  ></button>
-                  <button
-                    type="button"
-                    className="icon icon-pause"
-                    onClickCapture={this.onStop}
-                  ></button>
-                </>
-              ) : null}
-              {timer}
-            </span>
-            <span className="description">{createdAt}</span>
-          </label>
-          {!isChecked ? (
-            <button
-              className="icon icon-edit"
-              type="button"
-              onClick={handleEditTask}
-            ></button>
-          ) : null}
-          <button className="icon icon-destroy" type="button" onClick={onDelete}></button>
-        </div>
-        <input type="text" className="edit" onKeyDown={this.keyDown} />
-      </>
-    );
-  }
+  return (
+    <>
+      <div className="view">
+        <input
+          className="toggle"
+          type="checkbox"
+          onChange={onCompleteTask}
+          checked={checked}
+        />
+        <label>
+          <span className="title">{content}</span>
+          <span className="description">
+            {!isChecked ? (
+              <>
+                <button
+                  type="button"
+                  className="icon icon-play"
+                  // onClickCapture={onStart}
+                ></button>
+                <button
+                  type="button"
+                  className="icon icon-pause"
+                  // onClickCapture={onStop}
+                ></button>
+              </>
+            ) : null}
+            {formatedTimeToDo}
+          </span>
+          <span className="description">{createdAt}</span>
+        </label>
+        {!isChecked ? (
+          <button
+            className="icon icon-edit"
+            type="button"
+            onClick={handleEditTask}
+          ></button>
+        ) : null}
+        <button className="icon icon-destroy" type="button" onClick={onDelete}></button>
+      </div>
+      <input type="text" className="edit" onKeyDown={keyDown} />
+    </>
+  );
 }
-
-export default Task;

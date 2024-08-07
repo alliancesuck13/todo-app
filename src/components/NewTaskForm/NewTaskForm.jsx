@@ -1,106 +1,101 @@
-/* eslint-disable react/prefer-stateless-function */
-import React from "react";
+import { Component, useState } from "react";
 import PropTypes from "prop-types";
 
 import "./NewTaskForm.css";
 
-class NewTaskForm extends React.Component {
-  static propTypes = {
-    onTaskAdded: PropTypes.func,
-  };
+Component.propTypes = {
+  onTaskAdded: PropTypes.func,
+};
 
-  static defaultProps = {
-    onTaskAdded: () => {
-      throw new TypeError(`Отсутствует prop добавления Task в ${this}`);
-    },
-  };
+Component.defaultProps = {
+  onTaskAdded: () => {
+    throw new TypeError(`Отсутствует prop добавления Task в ${this}`);
+  },
+};
 
-  constructor() {
-    super();
+export default function NewTaskForm({ onTaskAdded }) {
+  const [state, setState] = useState({
+    taskValue: "",
+    minutesValue: "",
+    secondsValue: "",
+  });
+  const placeholder = "What needs to be done?";
 
-    this.state = {
-      taskValue: "",
-      minutesValue: "",
-      secondsValue: "",
-    };
-  }
-
-  onSubmitTask = (e) => {
-    const { onTaskAdded } = this.props;
-    const { taskValue } = this.state;
-    let { minutesValue, secondsValue } = this.state;
-
+  const onSubmitTask = (e) => {
     e.preventDefault();
 
     let minutes =
-      +minutesValue >= 60 ? (minutesValue = "59") && (secondsValue = "59") : minutesValue;
+      +state.minutesValue >= 60
+        ? (state.minutesValue = "59") && (state.secondsValue = "59")
+        : state.minutesValue;
     const seconds =
-      +secondsValue >= 3600 ? (minutes = "59") && (secondsValue = "59") : secondsValue;
+      +state.secondsValue >= 3600
+        ? (minutes = "59") && (state.secondsValue = "59")
+        : state.secondsValue;
 
     let time = new Date(0, 0, 0, 0, minutes, seconds);
     if (minutes === "") time = new Date(0, 0, 0, 0, 0, seconds);
     if (seconds === "") time = new Date(0, 0, 0, 0, minutes, 0);
     if (minutes === "" && seconds === "") time = new Date(0, 0, 0, 0, 0, 0);
 
-    if (!taskValue.length || (!minutesValue.length && !secondsValue.length)) return;
-    onTaskAdded(taskValue, time);
+    if (
+      !state.taskValue.length ||
+      (!state.minutesValue.length && !state.secondsValue.length)
+    ) {
+      return;
+    }
 
-    this.setState({ taskValue: "", minutesValue: "", secondsValue: "" });
+    onTaskAdded(state.taskValue, time);
+
+    setState({ taskValue: "", minutesValue: "", secondsValue: "" });
   };
 
-  onChangeTaskValue = (e) => {
+  const onChangeTaskValue = (e) => {
     if (e.target.value.match(/^[ ]+$/)) return;
-    this.setState({ taskValue: e.target.value });
+    setState((prevState) => ({ ...prevState, taskValue: e.target.value }));
   };
 
-  onChangeMinutes = (e) => {
+  const onChangeMinutes = (e) => {
     if (e.target.value.match(/^[ ]+$/)) return;
     if (e.target.value.match(/^\d+$/) || e.target.value === "") {
-      this.setState({ minutesValue: e.target.value });
+      setState((prevState) => ({ ...prevState, minutesValue: e.target.value }));
     }
   };
 
-  onChangeSeconds = (e) => {
+  const onChangeSeconds = (e) => {
     if (e.target.value.match(/^[ ]+$/)) return;
     if (e.target.value.match(/^\d+$/) || e.target.value === "") {
-      this.setState({ secondsValue: e.target.value });
+      setState((prevState) => ({ ...prevState, secondsValue: e.target.value }));
     }
   };
 
-  render() {
-    const { taskValue, minutesValue, secondsValue } = this.state;
-    const placeholder = "What needs to be done?";
-
-    return (
-      <header className="header">
-        <h1>Todo App</h1>
-        <form className="new-todo-form" onSubmit={this.onSubmitTask}>
-          <input
-            className="new-todo"
-            placeholder={placeholder}
-            onChange={this.onChangeTaskValue}
-            type="text"
-            value={taskValue}
-          />
-          <input
-            className="new-todo-form__timer"
-            placeholder="Min"
-            onChange={this.onChangeMinutes}
-            type="text"
-            value={minutesValue}
-          />
-          <input
-            className="new-todo-form__timer"
-            placeholder="Sec"
-            onChange={this.onChangeSeconds}
-            type="text"
-            value={secondsValue}
-          />
-          <button type="submit"></button>
-        </form>
-      </header>
-    );
-  }
+  return (
+    <header className="header">
+      <h1>Todo App</h1>
+      <form className="new-todo-form" onSubmit={onSubmitTask}>
+        <input
+          className="new-todo"
+          placeholder={placeholder}
+          onChange={onChangeTaskValue}
+          type="text"
+          value={state.taskValue}
+        />
+        <input
+          className="new-todo-form__timer"
+          placeholder="Min"
+          onChange={onChangeMinutes}
+          type="text"
+          value={state.minutesValue}
+        />
+        <input
+          className="new-todo-form__timer"
+          placeholder="Sec"
+          onChange={onChangeSeconds}
+          type="text"
+          value={state.secondsValue}
+        />
+        <button type="submit"></button>
+      </form>
+    </header>
+  );
 }
-
-export default NewTaskForm;

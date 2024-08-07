@@ -1,104 +1,84 @@
-/* eslint-disable react/prefer-stateless-function */
-import React from "react";
+import { Component } from "react";
 import PropTypes from "prop-types";
 
 import Task from "../Task";
 import "./TaskList.css";
 
-class TaskList extends React.Component {
-  static propTypes = {
-    todoList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)),
-    onTaskDeleted: PropTypes.func,
-    onTaskCompleted: PropTypes.func,
-    onTaskEdited: PropTypes.func,
-    handleEditTask: PropTypes.func,
-  };
+Component.propTypes = {
+  todoList: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.any)),
+  onTaskDeleted: PropTypes.func,
+  onTaskCompleted: PropTypes.func,
+  onTaskEdited: PropTypes.func,
+  handleEditTask: PropTypes.func,
+};
 
-  static defaultProps = {
-    todoList: [
-      {
-        id: 1,
-        content: "Fix bugs",
-        isEditing: false,
-        isActive: true,
-        creationDate: new Date(),
-      },
-      {
-        id: 2,
-        content: "Watch to your code",
-        isEditing: false,
-        isActive: true,
-        creationDate: new Date(),
-      },
-      {
-        id: 3,
-        content: "Being stupid",
-        isEditing: false,
-        isActive: false,
-        creationDate: new Date(),
-      },
-    ],
-    onTaskDeleted: () => {
-      throw new TypeError(`Отсутствует prop удаления Task в ${this}`);
+Component.defaultProps = {
+  todoList: [
+    {
+      id: 1,
+      content: "Fix bugs",
+      isEditing: false,
+      isActive: true,
+      creationDate: new Date(),
     },
-    onTaskCompleted: () => {
-      throw new TypeError(`Отсутствует prop выполнения Task в ${this}`);
+    {
+      id: 2,
+      content: "Watch to your code",
+      isEditing: false,
+      isActive: true,
+      creationDate: new Date(),
     },
-    onTaskEdited: () => {
-      throw new TypeError(`Отсутствует prop редактирования Task в ${this}`);
+    {
+      id: 3,
+      content: "Being stupid",
+      isEditing: false,
+      isActive: false,
+      creationDate: new Date(),
     },
-    handleEditTask: () => {
-      throw new TypeError(`Отсутствует prop ожидания редактирования Task в ${this}`);
-    },
-  };
+  ],
+  onTaskDeleted: () => {
+    throw new TypeError(`Отсутствует prop удаления Task в ${this}`);
+  },
+  onTaskCompleted: () => {
+    throw new TypeError(`Отсутствует prop выполнения Task в ${this}`);
+  },
+  onTaskEdited: () => {
+    throw new TypeError(`Отсутствует prop редактирования Task в ${this}`);
+  },
+  handleEditTask: () => {
+    throw new TypeError(`Отсутствует prop ожидания редактирования Task в ${this}`);
+  },
+};
 
-  render() {
-    const {
-      todoList,
-      onTaskDeleted,
-      onTaskCompleted,
-      onTaskEdited,
-      handleEditTask,
-      onTimerTaskStoped,
-      onTimerTaskStarted,
-      setNewTimerTask,
-      filter,
-      completeTaskWhenTimerEnd,
-    } = this.props;
+export default function TaskList({
+  todoList,
+  onTaskDeleted,
+  onTaskCompleted,
+  onTaskEdited,
+  handleEditTask,
+}) {
+  const todoItems = todoList.map((item) => {
+    let taskClassName = "";
+    if (item.isActive) taskClassName = "";
+    if (item.isActive && item.isEditing) taskClassName = " editing";
+    if (!item.isActive) taskClassName = "completed";
 
-    const todoItems = todoList.map((item) => {
-      let taskClassName = "";
-      if (item.isActive) taskClassName = "";
-      if (item.isActive && item.isEditing) taskClassName = " editing";
-      if (!item.isActive) taskClassName = "completed";
+    return (
+      <li className={taskClassName} key={item.id}>
+        <Task
+          content={item.content}
+          creationDate={item.creationDate}
+          isChecked={!item.isActive}
+          onDelete={() => onTaskDeleted(item.id)}
+          onDeleteCompletedTasks={() => onTaskCompleted(item.id)}
+          onComplete={() => onTaskCompleted(item.id)}
+          onEdit={(text) => onTaskEdited.call(this, item.id, text)}
+          handleEditTask={() => handleEditTask(item.id)}
+          timeToDo={item.timeToDoTask}
+        />
+      </li>
+    );
+  });
 
-      return (
-        <li className={taskClassName} key={item.id}>
-          <Task
-            content={item.content}
-            creationDate={item.creationDate}
-            isChecked={!item.isActive}
-            onDelete={() => onTaskDeleted(item.id)}
-            onDeleteCompletedTasks={() => onTaskCompleted(item.id)}
-            onComplete={() => onTaskCompleted(item.id)}
-            onEdit={(text) => onTaskEdited.call(this, item.id, text)}
-            handleEditTask={() => handleEditTask(item.id)}
-            timeToDo={item.timeToDoTask}
-            timerIsStarted={item.timerIsStarted}
-            onStoped={() => onTimerTaskStoped(item.id)}
-            onStarted={() => onTimerTaskStarted(item.id)}
-            setNewTimerTask={(timestamp) =>
-              setNewTimerTask.call(this, item.id, timestamp)
-            }
-            filter={filter}
-            completeTaskWhenTimerEnd={() => completeTaskWhenTimerEnd(item.id)}
-          />
-        </li>
-      );
-    });
-
-    return <ul className="todo-list">{todoItems}</ul>;
-  }
+  return <ul className="todo-list">{todoItems}</ul>;
 }
-
-export default TaskList;

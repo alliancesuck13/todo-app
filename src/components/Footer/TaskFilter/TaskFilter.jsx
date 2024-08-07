@@ -1,41 +1,60 @@
-/* eslint-disable react/prefer-stateless-function */
-import React from "react";
+import generateUniqueID from "../../TodoApp/utils/generateUniqueID";
 
-import FilterButton from "./FilterButton";
 import "./TaskFilter.css";
 
-class TaskFilter extends React.Component {
-  render() {
-    const {
-      handleRenderAllTasks,
-      handleRenderCompletedTasks,
-      handleRenderActiveTasks,
-      filter,
-    } = this.props;
-
-    return (
-      <ul className="filters">
-        <FilterButton
-          className={filter === "all" ? "selected" : ""}
+export default function TaskFilter({
+  handleRenderAllTasks,
+  handleRenderCompletedTasks,
+  handleRenderActiveTasks,
+  filter,
+}) {
+  return (
+    <ul className="filters">
+      <li key={generateUniqueID()}>
+        <button
+          type="button"
           onClick={handleRenderAllTasks}
+          className={filter === "all" ? "selected" : ""}
         >
           All
-        </FilterButton>
-        <FilterButton
-          className={filter === "active" ? "selected" : ""}
+        </button>
+      </li>
+      <li key={generateUniqueID()}>
+        <button
+          type="button"
           onClick={handleRenderActiveTasks}
+          className={filter === "active" ? "selected" : ""}
         >
           Active
-        </FilterButton>
-        <FilterButton
-          className={filter === "completed" ? "selected" : ""}
+        </button>
+      </li>
+      <li key={generateUniqueID()}>
+        <button
+          type="button"
           onClick={handleRenderCompletedTasks}
+          className={filter === "completed" ? "selected" : ""}
         >
           Completed
-        </FilterButton>
-      </ul>
-    );
-  }
+        </button>
+      </li>
+      {/* <FilterButton
+        className={filter === "all" ? "selected" : ""}
+        onClick={handleRenderAllTasks}
+      >
+        All
+      </FilterButton>
+      <FilterButton
+        className={filter === "active" ? "selected" : ""}
+        onClick={handleRenderActiveTasks}
+      >
+        Active
+      </FilterButton>
+      <FilterButton
+        className={filter === "completed" ? "selected" : ""}
+        onClick={handleRenderCompletedTasks}
+      >
+        Completed
+      </FilterButton> */}
+    </ul>
+  );
 }
-
-export default TaskFilter;
